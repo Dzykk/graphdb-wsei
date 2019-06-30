@@ -34,3 +34,16 @@ gb.Title AS SuggestedGameTitle,
 collect(distinct tb.Name) AS SuggestedGameType,
 collect(distinct cb.Name) AS SuggestedGameCategory
 ORDER BY Artist, OwnedGameTitle
+
+4.Match games that a specific player wants to buy with people who want to sell these games. Optionally filter by the game's condition (used or new). 
+Return game's title with its seller's name, location, condition and price of a game.
+
+MATCH(p:Person{Name:'Emily', LastName:'Late'})-[:WANTSTOBUY]->(g:Game)<-[wts:WANTSTOSELL]-(s:Person)
+//WHERE wts.condition = 'used' OR wts.condition = 'new'
+RETURN
+g.Title AS GameTitle, 
+wts.for AS GamePrice,
+wts.condition AS GameCondition,
+s.Name + ' ' + s.LastName AS SellerName,
+s.From AS SellerLocation
+ORDER BY GameTitle, GamePrice, GameCondition

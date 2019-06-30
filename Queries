@@ -5,9 +5,8 @@ RETURN
 p.Name AS PlayerName,
 p.LastName AS PlayerLastName,
 p.From AS PlayerFrom,
-g.Title AS GameTitle,
-g.ReleaseDate AS GameReleaseDate
-ORDER BY p.LastName, p.Name, g.Title
+COLLECT(g.Title + ', ' + g.ReleaseDate) AS Games
+ORDER BY p.LastName, p.Name
 
 //2. Pokaż gry z kategorii fantasy i sprawdź, które z nich są najbardziej popularne opierając się na ilości osób posiadających je, chcących w nie zagrać lub chcących je kupić, a następnie
 //ułóż je w kolejności od największej do najmniejszej opierając się na wyliczonej popularności i zwróć ich tytuły, daty wydania i wskaźnik popularności.

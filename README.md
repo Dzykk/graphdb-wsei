@@ -28,6 +28,6 @@ Zapytania wraz z ich opisami znajdują się w pliku Queries.
 
 ## Licencja
 
-Ten projekt posiada licencję MIT License - przejdź do [LICENSE.md](LICENSE.md) by poznać szczegóły.
+Ten projekt posiada licencję MIT License - przejdź do [LICENSE](LICENSE) by poznać szczegóły.
 
 

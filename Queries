@@ -51,7 +51,8 @@ ORDER BY GameTitle, GamePrice, GameCondition
 //5. Pokaż kategorie gier, w które gra konkretny gracz i połącz je z innymi osobami, które grają w gry o podobnych kategoriach. Sprawdź ilość podobieństw, a następnie zwróć
 //trzech sugerowanych przyjaciół z największą ilością podobieństw oraz kategoriami, które są wspólne dla obu graczy.
 
-MATCH (p:Person{Name:'Timothy', LastName: 'Fairgraves'})-[:OWNS|:WANTSTOPLAY]->(g:Game), (g)-[:ISCATEGORY]->(c:Category), (f:Person)-[:OWNS|:WANTSTOPLAY]->(gf:Game), (gf)-[:ISCATEGORY]->(cf:Category)
+MATCH (p:Person{Name:'Timothy', LastName: 'Fairwell'})-[:OWNS|:WANTSTOPLAY]->(g:Game), (g)-[:ISCATEGORY]->(c:Category), 
+(f:Person)-[:OWNS|:WANTSTOPLAY]->(gf:Game), (gf)-[:ISCATEGORY]->(cf:Category)
 WHERE c.Name = cf.Name AND NOT id(p) = id(f) 
 RETURN 
 f.Name+ ' ' + f.LastName AS SuggestedFriend,
@@ -59,3 +60,12 @@ COLLECT(distinct c.Name) AS SimilarCategories,
 COUNT(distinct cf) AS Similarities
 ORDER BY
 Similarities DESC LIMIT 3
+
+//6. Pokaż wydawców gier i połącz je z grami, które wydali. Przefiltruj wydawców po liczbie wydanych gier (więcej niż dwie), a następnie połącz gry ze swoimi projektantami.
+// Zwróć wydawców, gry i projektantów by sprawdzić, dla ilu wydawców pracowali dani projektanci.
+
+MATCH (p:Publisher)-[:PUBLISHED]->(g:Game)
+WITH p, COUNT(g) AS NumberOfGames
+MATCH (p)-[:PUBLISHED]->(g)<-[:DESIGNED]-(d:Person)
+WHERE NumberOfGames >=2 AND NOT (g)-[:EXPANSION]->()
+RETURN p, g, d

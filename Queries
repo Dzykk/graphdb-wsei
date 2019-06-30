@@ -1,0 +1,36 @@
+1. Match players who own Strategy Games and return the list of the players, their location and games they own
+
+MATCH(p:Person)-[:OWNS]->(g:Game)-[:ISTYPE]->(t:Type{Name: 'Strategy'})
+RETURN
+p.Name AS PlayerName,
+p.LastName AS PlayerLastName,
+p.From AS PlayerFrom,
+g.Title AS GameTitle,
+g.ReleaseDate AS GameReleaseDate
+ORDER BY p.LastName, p.Name, g.Title
+
+2. Match games of fantasy category and check, which of them are the most popular based on a number of people owning, wanting to buy or wanting to play them, then order them based on Popularity
+and limit to top 3. Return games' titles, release dates and popularity number.
+
+MATCH(p:Person)-[:OWNS|:WANTSTOBUY|:WANTSTOPLAY]->(g:Game)-[:ISCATEGORY]->(c:Category{Name:'Fantasy'})
+WITH g, COUNT(p) AS Popularity
+RETURN
+g.Title AS GameTitle,
+g.ReleaseDate AS GameReleaseDate,
+Popularity
+ORDER BY Popularity DESC LIMIT 3
+
+3. Match games owned by a specific player to the games created by the same artist that the owned games were created by. Match both owned and suggested games with their types and categories. 
+Exclude games owned by the player from suggested games and return a list of owned games with their types and categories matched to an artist and then to suggested games by that same artist.
+
+MATCH(p:Person{Name:'Bob', LastName:'Johnson'})-[:OWNS]->(ga:Game)<-[:CREATED]-(a:Person)-[:CREATED]->(gb:Game), (ga)-[:ISTYPE]->(ta:Type), (ga)-[:ISCATEGORY]->(ca:Category),(gb)-[:ISTYPE]->(tb:Type), (gb)-[:ISCATEGORY]->(cb:Category)
+WHERE NOT (p)-[:OWNS]-(gb)
+RETURN
+ga.Title AS OwnedGameTitle,
+collect(distinct ta.Name) AS OwnedGameType,
+collect(distinct ca.Name) AS OwnedGameCategory,
+a.Name +' ' + a.LastName AS Artist,
+gb.Title AS SuggestedGameTitle,
+collect(distinct tb.Name) AS SuggestedGameType,
+collect(distinct cb.Name) AS SuggestedGameCategory
+ORDER BY Artist, OwnedGameTitle

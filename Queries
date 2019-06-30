@@ -1,4 +1,4 @@
-1. Match players who own Strategy Games and return the list of the players, their location and games they own
+//1. Pokaż graczy, którzy posiadają gry strategiczne i zwróć ich imiona, nazwiska, lokalizacje oraz tytuły i daty wydania gier strategicznych, które posiadają.
 
 MATCH(p:Person)-[:OWNS]->(g:Game)-[:ISTYPE]->(t:Type{Name: 'Strategy'})
 RETURN
@@ -9,8 +9,8 @@ g.Title AS GameTitle,
 g.ReleaseDate AS GameReleaseDate
 ORDER BY p.LastName, p.Name, g.Title
 
-2. Match games of fantasy category and check, which of them are the most popular based on a number of people owning, wanting to buy or wanting to play them, then order them based on Popularity
-and limit to top 3. Return games' titles, release dates and popularity number.
+//2. Pokaż gry z kategorii fantasy i sprawdź, które z nich są najbardziej popularne opierając się na ilości osób posiadających je, chcących w nie zagrać lub chcących je kupić, a następnie
+//ułóż je w kolejności od największej do najmniejszej opierając się na wyliczonej popularności i zwróć ich tytuły, daty wydania i wskaźnik popularności.
 
 MATCH(p:Person)-[:OWNS|:WANTSTOBUY|:WANTSTOPLAY]->(g:Game)-[:ISCATEGORY]->(c:Category{Name:'Fantasy'})
 WITH g, COUNT(p) AS Popularity
@@ -20,8 +20,8 @@ g.ReleaseDate AS GameReleaseDate,
 Popularity
 ORDER BY Popularity DESC LIMIT 3
 
-3. Match games owned by a specific player to the games created by the same artist that the owned games were created by. Match both owned and suggested games with their types and categories. 
-Exclude games owned by the player from suggested games and return a list of owned games with their types and categories matched to an artist and then to suggested games by that same artist.
+//3. Pokaż gry które posiada konkretny gracz i połącz je z artystami, którzy te gry stworzyli. Następnie dołącz do tych artystów inne gry, które stworzyli, a któych nie posiadał gracz.
+//Zwróć tytuły gier posiadanych przez gracza, ich typ oraz kategorie, artystę który stworzył te gry oraz sugerowane inne gry wraz z ich danymi stworzonymi przez tego samego artystę.
 
 MATCH(p:Person{Name:'Bob', LastName:'Johnson'})-[:OWNS]->(ga:Game)<-[:CREATED]-(a:Person)-[:CREATED]->(gb:Game), (ga)-[:ISTYPE]->(ta:Type), (ga)-[:ISCATEGORY]->(ca:Category),(gb)-[:ISTYPE]->(tb:Type), (gb)-[:ISCATEGORY]->(cb:Category)
 WHERE NOT (p)-[:OWNS]-(gb)
@@ -35,8 +35,8 @@ collect(distinct tb.Name) AS SuggestedGameType,
 collect(distinct cb.Name) AS SuggestedGameCategory
 ORDER BY Artist, OwnedGameTitle
 
-4.Match games that a specific player wants to buy with people who want to sell these games. Optionally filter by the game's condition (used or new). 
-Return game's title with its seller's name, location, condition and price of a game.
+//4. Pokaż gry, które konkretny gracz chce kupić i połącz je z osobami, które te gry sprzedają. Opcjonalnie przefiltruj gry po ich stanie używalności (nowe lub używane).
+//Zwróć tytuły gier danymi osób, które je sprzedają, stanem gry oraz ich ceną.
 
 MATCH(p:Person{Name:'Emily', LastName:'Late'})-[:WANTSTOBUY]->(g:Game)<-[wts:WANTSTOSELL]-(s:Person)
 //WHERE wts.condition = 'used' OR wts.condition = 'new'
@@ -47,3 +47,15 @@ wts.condition AS GameCondition,
 s.Name + ' ' + s.LastName AS SellerName,
 s.From AS SellerLocation
 ORDER BY GameTitle, GamePrice, GameCondition
+
+//5. Pokaż kategorie gier, w które gra konkretny gracz i połącz je z innymi osobami, które grają w gry o podobnych kategoriach. Sprawdź ilość podobieństw, a następnie zwróć
+//trzech sugerowanych przyjaciół z największą ilością podobieństw oraz kategoriami, które są wspólne dla obu graczy.
+
+MATCH (p:Person{Name:'Timothy', LastName: 'Fairgraves'})-[:OWNS|:WANTSTOPLAY]->(g:Game), (g)-[:ISCATEGORY]->(c:Category), (f:Person)-[:OWNS|:WANTSTOPLAY]->(gf:Game), (gf)-[:ISCATEGORY]->(cf:Category)
+WHERE c.Name = cf.Name AND NOT id(p) = id(f) 
+RETURN 
+f.Name+ ' ' + f.LastName AS SuggestedFriend,
+COLLECT(distinct c.Name) AS SimilarCategories,
+COUNT(distinct cf) AS Similarities
+ORDER BY
+Similarities DESC LIMIT 3

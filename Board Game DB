@@ -319,7 +319,7 @@ CREATE(claus)-[:CREATED]->(cac)
 
 // Create players with their multiple relations to games
 CREATE(user1:Person{Name:"Bob",LastName:"Johnson",From:"USA",Type:"Player"})
-CREATE(user2:Person{Name:"Timothy",LastName:"Fairgraves",From:"England",Type:"Player"})
+CREATE(user2:Person{Name:"Timothy",LastName:"Fairwell",From:"England",Type:"Player"})
 CREATE(user3:Person{Name:"Wolfgang",LastName:"Spaetzle",From:"Switzerland",Type:"Player"})
 CREATE(user4:Person{Name:"Joakim",LastName:"Tangstad",From:"Norway",Type:"Player"})
 CREATE(user5:Person{Name:"Emily",LastName:"Late",From:"USA",Type:"Player"})
